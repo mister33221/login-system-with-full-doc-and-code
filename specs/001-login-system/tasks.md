@@ -48,11 +48,11 @@ description: "Task list for login & RBAC system"
 - [X] T010 定義 Domain/Entity/Repository 介面：User, Role, Permission, Session, AuditEvent：`backend/src/main/java/.../domain`
 - [X] T011 [P] 實作 Repository（PostgreSQL + JPA/SQL）：`backend/src/main/java/.../infrastructure/repository`
 - [X] T012 [P] 設定 OpenAPI/Swagger（Springdoc）：`/v3/api-docs`, `/swagger-ui.html`，並補充 README/文件說明
-- [ ] T011 統一錯誤回應格式與全域例外處理：`backend/src/main/java/.../api` & `.../infrastructure`
-- [ ] T012 設定應用組態分環境（dev/prod）：`backend/src/main/resources/application-dev.yml`, `application-prod.yml`
-- [ ] T013 [P] 前端 HTTP Interceptor（附帶/刷新 Token、處理 401/403）：`frontend/src/app/core/auth`
-- [ ] T014 Route Guard 保護受控頁面：`frontend/src/app/core/auth`
-- [ ] T015 建立 Tailwind 設定與共用 UI 樣式：`frontend/tailwind.config.js`, `frontend/src/styles.css`
+- [X] T013 統一錯誤回應格式與全域例外處理：`backend/src/main/java/.../api` & `.../infrastructure`
+- [X] T014 設定應用組態分環境（dev/prod）：`backend/src/main/resources/application-dev.yml`, `application-prod.yml`
+- [X] T015 [P] 前端 HTTP Interceptor（附帶/刷新 Token、處理 401/403）：`frontend/src/app/core/auth`
+- [X] T016 Route Guard 保護受控頁面：`frontend/src/app/core/auth`
+- [X] T017 建立 Tailwind 設定與共用 UI 樣式：`frontend/tailwind.config.js`, `frontend/src/styles.css`
 
 ## Phase 3: User Story 1 - 安全登入與登出體驗（P1） ✅ MVP
 
