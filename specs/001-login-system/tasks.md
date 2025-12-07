@@ -37,7 +37,7 @@ description: "Task list for login & RBAC system"
 - [X] T003 設定 PostgreSQL service（官方 image、環境變數、volume）：`docker-compose.yml`
 - [X] T004 建立 Flyway 初始 migration：`backend/src/main/resources/db/migration/V1__init.sql`
 - [X] T005 初始化 Spring Boot 專案框架與模組目錄（api/application/domain/infrastructure）：`backend/`
-- [ ] T006 初始化 Angular 專案與 Tailwind、ESLint/Prettier：`frontend/`
+- [X] T006 初始化 Angular 專案與 Tailwind、ESLint/Prettier：`frontend/`
 
 ## Phase 2: Foundational（Blocking Prerequisites）
 
