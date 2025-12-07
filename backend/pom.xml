@@ -7,7 +7,7 @@
     <artifactId>login-system</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>login-system</name>
-    <description>Login & RBAC system</description>
+    <description>Login and RBAC system</description>
     <properties>
         <java.version>17</java.version>
         <spring.boot.version>3.2.0</spring.boot.version>
@@ -85,4 +85,19 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring-boot.run.profiles>dev</spring-boot.run.profiles>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring-boot.run.profiles>prod</spring-boot.run.profiles>
+            </properties>
+        </profile>
+    </profiles>
 </project>
