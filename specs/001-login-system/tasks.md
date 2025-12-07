@@ -38,6 +38,7 @@ description: "Task list for login & RBAC system"
 - [X] T004 建立 Flyway 初始 migration：`backend/src/main/resources/db/migration/V1__init.sql`
 - [X] T005 初始化 Spring Boot 專案框架與模組目錄（api/application/domain/infrastructure）：`backend/`
 - [X] T006 初始化 Angular 專案與 Tailwind、ESLint/Prettier：`frontend/`
+  - 已建立基本路由/守衛/攔截器與樣板頁面（Login、Dashboard、Roles/Audit/Sessions、403/404）
 
 ## Phase 2: Foundational（Blocking Prerequisites）
 
