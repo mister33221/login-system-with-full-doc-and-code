@@ -1,50 +1,49 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: N/A -> 1.0.0
+- Modified principles: 工程品質一致性、測試驅動與品質門檻、使用者體驗一致性、效能與穩定性預算、精實敏捷交付
+- Added sections: 技術堆疊與品質標準, 開發流程與審查
+- Removed sections: 無
+- Templates requiring updates: .specify/templates/plan-template.md (updated), .specify/templates/spec-template.md (無需更新), .specify/templates/tasks-template.md (updated)
+- Follow-up TODOs: 無
+-->
+
+# Login System Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. 工程品質一致性
+保持 Angular 前端、Spring Boot 後端與 Nginx 配置的工程規範一致。遵循清晰分層（UI/應用/領域/基礎設施），使用既有框架最佳實務（Angular 嚴格模式與 ESLint、Spring Boot 分層架構與 Bean 驗證、Nginx 配置版本控管）。程式碼必須可維護、可閱讀、可追蹤變更；重複邏輯抽象為共享模組但避免過度設計；所有變更需經同行審查並附帶風險說明。
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. 測試驅動與品質門檻
+風險優先撰寫測試並以測試結果作為交付門檻。單元測試涵蓋關鍵邏輯（前後端各模組覆蓋率不低於 80%），後端對外 API 需具契約/整合測試，前端關鍵流程需有端對端驗證。失敗測試禁止合併；缺測試的程式碼變更視為未完成。回歸與安全性敏感區域採自動化優先。
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. 使用者體驗一致性
+UI 行為、文案與狀態呈現保持一致且可預期。共用設計令牌（色彩、間距、字體）與元件庫；表單/錯誤提示/空狀態需一致，並提供可存取性（鍵盤操作、ARIA 標記、對比度）。跨裝置響應式體驗必須保證主要流程可用；任何破壞一致性的變更需提供設計理由與回退策略。
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. 效能與穩定性預算
+預先設定並驗證效能與可靠性目標。後端 API p95 延遲 < 300ms（業務性耗時操作需以佇列或快取隔離），Nginx 必須啟用 TLS、壓縮與適當快取/限流；前端首屏可互動時間目標 < 2.5s（中等網路裝置），Bundle 體積與資料請求須控管。效能回歸測試與監控指標（延遲、錯誤率、資源使用）需在 CI/CD 或驗收階段驗證。
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. 精實敏捷交付
+以 MVP 為核心拆分需求，避免過度設計。每一個 User Story 皆需可獨立開發、測試、部署；任務以最小可驗證增量拆分並排序。工作流程遵循 Phase 0 研究 → Phase 1 設計/計畫 → Phase 2 實作 → Phase 3 驗證/回饋的迭代節奏，持續回收用戶與效能數據做微調。
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## 技術堆疊與品質標準
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Angular：啟用嚴格型別，預設 OnPush 變更檢測（除非有明確理由），ESLint + Prettier/格式化一致；共用 UI 元件需有 Story/示例與可存取性校驗；前端 HTTP 呼叫以型別安全客戶端並包裝錯誤/重試策略。
+- Spring Boot：遵循分層與依賴反轉，DTO 與領域模型分離；使用 Bean Validation 進行輸入校驗；資料庫遷移透過工具（如 Flyway/Liquibase）版本化；日誌需結構化並隱藏敏感資訊；提供健康檢查與指標暴露端點。
+- Nginx：配置版本化並有預設安全基線（TLS 1.2+、嚴格頭），啟用 gzip/Brotli、快取與限流，確保上游超時與重試策略一致；日誌需可供追蹤請求與效能。
+- 品質檢查：CI 必須執行 lint、型別檢查、單元與整合/端對端測試；主幹分支需保持可部署狀態，禁止跳過紅燈；產出文件（架構決策、API 契約、操作手冊）與變更同步。
+- 安全與資料：密碼與秘密資訊不得硬編碼；使用環境變數/密鑰管理；個資/敏感資料傳輸與儲存需加密並最小化收集。
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## 開發流程與審查
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- 需求分解：以 User Story 驅動，清楚定義驗收標準與驗證方式；先確立 MVP 範圍，再依優先級擴展。
+- 規劃節奏：Phase 0（研究/風險），Phase 1（架構/資料模型/合約），Phase 2（實作與測試），Phase 3（驗證/回饋/效能檢查）；每一 Phase 完成前需通過相應品質檢查。
+- 審查標準：程式碼審查必須檢查原則遵循度、測試覆蓋與效能/安全影響；重大設計決策需記錄決策理由與取捨。
+- 驗收與交付：Definition of Done = 原則符合 + 測試通過 + 文件更新 + 監控/告警配置完成（如適用）；部署前需跑回歸與效能驗證清單。
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+此憲章為開發與交付的強制性準則；如有衝突，以本憲章為準。任何修訂需提出變更說明、影響分析、版本升級評估與過渡方案，並由產品與技術負責人共同核准。版本採語意化：新增或擴充原則為 MINOR，文字澄清為 PATCH，重大調整或移除原則為 MAJOR。至少每季度進行一次遵循度稽核（覆蓋程式碼品質、測試、UX 一致性與效能指標），稽核結果需納入後續迭代規劃。
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2025-12-07 | **Last Amended**: 2025-12-07

@@ -31,7 +31,11 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- 確認前端（Angular 嚴格模式、ESLint/Prettier）、後端（分層架構、Bean 驗證）、Nginx（TLS/壓縮/快取/限流）符合品質基線並納入計畫。
+- 定義測試策略與門檻：單元覆蓋率目標 ≥80%，後端契約/整合測試與前端端對端測試範圍明確，並於 CI 阻擋未通過的變更。
+- UX 一致性準則已落實於方案（設計令牌、元件重用、可存取性、錯誤/空狀態處理）。
+- 效能預算與驗證方式已列入（API p95 < 300ms、首屏可互動 < 2.5s、快取/佇列策略、監控指標）。
+- 需求已拆成可獨立交付的 User Story/Task，MVP 範圍明確且避免過度設計。
 
 ## Project Structure
 
