@@ -39,8 +39,8 @@ description: "Task list for login & RBAC system"
 - [X] T005 初始化 Spring Boot 專案框架與模組目錄（api/application/domain/infrastructure）：`backend/`
 - [X] T006 初始化 Angular 專案與 Tailwind、ESLint/Prettier：`frontend/`
   - 已建立基本路由/守衛/攔截器與樣板頁面（Login、Dashboard、Roles/Audit/Sessions、403/404）
-- [ ] T007 繪製系統架構圖（前端/後端/Nginx/PostgreSQL/docker-compose 網路），放置於 `docs/architecture/architecture.md`（或同層圖片引用）
-- [ ] T008 繪製部署與流程圖（含開發/本地環境：ng serve → Nginx → backend → db），放置於 `docs/architecture/deployment.md`
+- [X] T007 繪製系統架構圖（前端/後端/Nginx/PostgreSQL/docker-compose 網路），放置於 `docs/sd/sd-architecture.md`（或同層圖片引用）
+- [X] T008 繪製部署與流程圖（含開發/本地環境：ng serve → Nginx → backend → db），放置於 `docs/sd/sd-deployment.md`
 
 ## Phase 2: Foundational（Blocking Prerequisites）
 
