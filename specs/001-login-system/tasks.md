@@ -39,12 +39,14 @@ description: "Task list for login & RBAC system"
 - [X] T005 初始化 Spring Boot 專案框架與模組目錄（api/application/domain/infrastructure）：`backend/`
 - [X] T006 初始化 Angular 專案與 Tailwind、ESLint/Prettier：`frontend/`
   - 已建立基本路由/守衛/攔截器與樣板頁面（Login、Dashboard、Roles/Audit/Sessions、403/404）
+- [ ] T007 繪製系統架構圖（前端/後端/Nginx/PostgreSQL/docker-compose 網路），放置於 `docs/architecture/architecture.md`（或同層圖片引用）
+- [ ] T008 繪製部署與流程圖（含開發/本地環境：ng serve → Nginx → backend → db），放置於 `docs/architecture/deployment.md`
 
 ## Phase 2: Foundational（Blocking Prerequisites）
 
-- [ ] T008 [P] 設定 Spring Security/JWT 基礎配置（密鑰、過期時間、Filter）：`backend/src/main/java/.../infrastructure/security`
-- [ ] T009 定義 Domain/Entity/Repository 介面：User, Role, Permission, Session, AuditEvent：`backend/src/main/java/.../domain`
-- [ ] T010 [P] 實作 Repository（PostgreSQL + JPA/SQL）：`backend/src/main/java/.../infrastructure/repository`
+- [ ] T009 [P] 設定 Spring Security/JWT 基礎配置（密鑰、過期時間、Filter）：`backend/src/main/java/.../infrastructure/security`
+- [X] T010 定義 Domain/Entity/Repository 介面：User, Role, Permission, Session, AuditEvent：`backend/src/main/java/.../domain`
+- [X] T011 [P] 實作 Repository（PostgreSQL + JPA/SQL）：`backend/src/main/java/.../infrastructure/repository`
 - [ ] T011 統一錯誤回應格式與全域例外處理：`backend/src/main/java/.../api` & `.../infrastructure`
 - [ ] T012 設定應用組態分環境（dev/prod）：`backend/src/main/resources/application-dev.yml`, `application-prod.yml`
 - [ ] T013 [P] 前端 HTTP Interceptor（附帶/刷新 Token、處理 401/403）：`frontend/src/app/core/auth`
