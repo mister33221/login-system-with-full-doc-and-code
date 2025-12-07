@@ -32,10 +32,10 @@ description: "Task list for login & RBAC system"
 
 ## Phase 1: Setup（Shared Infrastructure）
 
-- [ ] T001 準備 docker-compose 骨架與網路：`docker-compose.yml` (nginx/backend/db)
-- [ ] T002 建立 Nginx 基礎設定：`nginx/nginx.conf`（轉發 / → 前端 dev 伺服器、/api/** → backend，預留 TLS）
-- [ ] T003 設定 PostgreSQL service（官方 image、環境變數、volume）：`docker-compose.yml`
-- [ ] T004 建立 Flyway 初始 migration：`backend/src/main/resources/db/migration/V1__init.sql`
+- [X] T001 準備 docker-compose 骨架與網路：`docker-compose.yml` (nginx/backend/db)
+- [X] T002 建立 Nginx 基礎設定：`nginx/nginx.conf`（轉發 / → 前端 dev 伺服器、/api/** → backend，預留 TLS）
+- [X] T003 設定 PostgreSQL service（官方 image、環境變數、volume）：`docker-compose.yml`
+- [X] T004 建立 Flyway 初始 migration：`backend/src/main/resources/db/migration/V1__init.sql`
 - [ ] T005 初始化 Spring Boot 專案框架與模組目錄（api/application/domain/infrastructure）：`backend/`
 - [ ] T006 初始化 Angular 專案與 Tailwind、ESLint/Prettier：`frontend/`
 

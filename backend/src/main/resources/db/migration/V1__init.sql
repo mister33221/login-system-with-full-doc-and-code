@@ -1,0 +1,135 @@
+-- Enable UUID generation
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username VARCHAR(64) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    email VARCHAR(128) UNIQUE,
+    status VARCHAR(16) NOT NULL CHECK (status IN ('active','locked','suspended')),
+    failed_attempts INT NOT NULL DEFAULT 0,
+    locked_until TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE roles (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    code VARCHAR(64) NOT NULL UNIQUE,
+    name VARCHAR(128) NOT NULL,
+    description VARCHAR(255),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE permissions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    code VARCHAR(128) NOT NULL UNIQUE,
+    resource VARCHAR(128) NOT NULL,
+    action VARCHAR(64) NOT NULL,
+    description VARCHAR(255)
+);
+
+CREATE TABLE user_roles (
+    user_id UUID NOT NULL,
+    role_id UUID NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, role_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+
+CREATE TABLE role_permissions (
+    role_id UUID NOT NULL,
+    permission_id UUID NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (role_id, permission_id),
+    FOREIGN KEY (role_id) REFERENCES roles(id),
+    FOREIGN KEY (permission_id) REFERENCES permissions(id)
+);
+
+CREATE TABLE sessions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL,
+    refresh_token_id UUID NOT NULL UNIQUE,
+    device_info VARCHAR(255),
+    ip INET,
+    user_agent VARCHAR(255),
+    issued_at TIMESTAMPTZ NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    revoked_at TIMESTAMPTZ,
+    revoked_reason VARCHAR(128),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+CREATE INDEX idx_sessions_user ON sessions(user_id);
+CREATE INDEX idx_sessions_exp ON sessions(expires_at);
+CREATE INDEX idx_sessions_revoked ON sessions(revoked_at);
+
+CREATE TABLE audit_events (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID,
+    session_id UUID,
+    resource VARCHAR(128) NOT NULL,
+    action VARCHAR(64) NOT NULL,
+    decision VARCHAR(16) NOT NULL CHECK (decision IN ('allow','deny')),
+    reason VARCHAR(255),
+    ip INET,
+    user_agent VARCHAR(255),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (session_id) REFERENCES sessions(id)
+);
+CREATE INDEX idx_audit_created ON audit_events(created_at);
+CREATE INDEX idx_audit_user ON audit_events(user_id);
+CREATE INDEX idx_audit_resource_action ON audit_events(resource, action);
+CREATE INDEX idx_audit_decision ON audit_events(decision);
+
+-- Seed core roles and permissions
+INSERT INTO roles (code, name, description) VALUES
+    ('ADMIN', 'Administrator', 'Full admin access'),
+    ('USER', 'User', 'Standard user'),
+    ('AUDITOR', 'Auditor', 'View audit logs')
+ON CONFLICT (code) DO NOTHING;
+
+INSERT INTO permissions (code, resource, action, description) VALUES
+    ('auth:login', 'auth', 'login', 'Perform login'),
+    ('auth:logout', 'auth', 'logout', 'Perform logout'),
+    ('auth:session:list', 'auth:session', 'list', 'List sessions'),
+    ('auth:session:revoke', 'auth:session', 'revoke', 'Revoke session'),
+    ('user:view', 'user', 'view', 'View users'),
+    ('user:assign-role', 'user', 'assign-role', 'Assign roles to user'),
+    ('role:create', 'role', 'create', 'Create roles'),
+    ('role:update', 'role', 'update', 'Update roles'),
+    ('role:delete', 'role', 'delete', 'Delete roles'),
+    ('role:view', 'role', 'view', 'View roles'),
+    ('permission:view', 'permission', 'view', 'View permissions'),
+    ('audit:view', 'audit', 'view', 'View audit events')
+ON CONFLICT (code) DO NOTHING;
+
+-- Assign all permissions to ADMIN, limited to AUDITOR/USER accordingly
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM roles r
+JOIN permissions p ON r.code = 'ADMIN'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM roles r
+JOIN permissions p ON r.code = 'AUDITOR' AND p.code = 'audit:view'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM roles r
+JOIN permissions p ON r.code = 'USER' AND p.code IN ('auth:login','auth:logout','auth:session:list','auth:session:revoke')
+ON CONFLICT DO NOTHING;
+
+-- Seed admin user (password to be reset)
+INSERT INTO users (username, password_hash, status, email)
+VALUES ('admin', '$2a$10$replace_with_real_hash', 'active', 'admin@example.com')
+ON CONFLICT (username) DO NOTHING;
+
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id FROM users u JOIN roles r ON u.username = 'admin' AND r.code = 'ADMIN'
+ON CONFLICT DO NOTHING;

@@ -1,0 +1,33 @@
+# Node / Angular
+node_modules/
+dist/
+build/
+.angular/
+.npm/
+npm-debug.log*
+yarn-error.log*
+.env*
+
+# Java / Spring Boot
+target/
+.mvn/
+.gradle/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE / Editor
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# OS
+.DS_Store
+Thumbs.db
