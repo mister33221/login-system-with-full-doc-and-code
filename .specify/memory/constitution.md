@@ -12,6 +12,9 @@ Sync Impact Report
 
 ## Core Principles
 
+### 0. 前提
+使用繁體中文(zh-tw)完成所有相關文件與程式碼註解。
+
 ### I. 工程品質一致性
 保持 Angular 前端、Spring Boot 後端與 Nginx 配置的工程規範一致。遵循清晰分層（UI/應用/領域/基礎設施），使用既有框架最佳實務（Angular 嚴格模式與 ESLint、Spring Boot 分層架構與 Bean 驗證、Nginx 配置版本控管）。程式碼必須可維護、可閱讀、可追蹤變更；重複邏輯抽象為共享模組但避免過度設計；所有變更需經同行審查並附帶風險說明。
 
