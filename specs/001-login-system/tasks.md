@@ -19,7 +19,7 @@ description: "Task list for login & RBAC system"
 
 ## Phase 0: SA/SD Docs（必須先完成）
 
-- [ ] T000 撰寫 SA/SD 文件初稿（根目錄，全部完成）：
+- [X] T000 撰寫 SA/SD 文件初稿（根目錄，全部完成）：
   - `sa-functional-requirements.md`: 功能需求與 Use Case，列出登入/登出/權限所有情境（正常/例外）＋ User Stories（身為 X，我希望 Y，從而 Z）。
   - `sa-rbac-model.md`: RBAC 權限模型，User/Role/Permission/Resource 關係，角色清單與權限對應。
   - `sa-login-logout-flow.md`: 登入/登出全流程（前端→後端→DB），含成功、失敗、鎖定、逾時、撤銷。
