@@ -21,3 +21,7 @@ logging:
   level:
     org.springframework.security: INFO
     org.hibernate.SQL: INFO
+security:
+  jwt:
+    # Base64 or raw secret; replace with secure value before production
+    secret: "dev-secret-key-please-change-1234567890"

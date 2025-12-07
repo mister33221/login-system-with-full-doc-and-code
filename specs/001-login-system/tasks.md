@@ -44,9 +44,10 @@ description: "Task list for login & RBAC system"
 
 ## Phase 2: Foundational（Blocking Prerequisites）
 
-- [ ] T009 [P] 設定 Spring Security/JWT 基礎配置（密鑰、過期時間、Filter）：`backend/src/main/java/.../infrastructure/security`
+- [X] T009 [P] 設定 Spring Security/JWT 基礎配置（密鑰、過期時間、Filter）：`backend/src/main/java/.../infrastructure/security`
 - [X] T010 定義 Domain/Entity/Repository 介面：User, Role, Permission, Session, AuditEvent：`backend/src/main/java/.../domain`
 - [X] T011 [P] 實作 Repository（PostgreSQL + JPA/SQL）：`backend/src/main/java/.../infrastructure/repository`
+- [ ] T012 [P] 設定 OpenAPI/Swagger（Springdoc）：`/v3/api-docs`, `/swagger-ui.html`，並補充 README/文件說明
 - [ ] T011 統一錯誤回應格式與全域例外處理：`backend/src/main/java/.../api` & `.../infrastructure`
 - [ ] T012 設定應用組態分環境（dev/prod）：`backend/src/main/resources/application-dev.yml`, `application-prod.yml`
 - [ ] T013 [P] 前端 HTTP Interceptor（附帶/刷新 Token、處理 401/403）：`frontend/src/app/core/auth`
