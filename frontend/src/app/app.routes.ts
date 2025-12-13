@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginPageComponent } from './features/login/login-page.component';
+import { RegisterPageComponent } from './features/register/register-page.component';
 import { Error403Component } from './pages/error/error-403.component';
 import { Error404Component } from './pages/error/error-404.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -11,6 +12,7 @@ import { RolesGuard } from './core/auth/roles.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
+  { path: 'register', component: RegisterPageComponent },
   {
     path: '',
     canActivate: [AuthGuard],

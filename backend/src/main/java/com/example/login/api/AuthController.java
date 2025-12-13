@@ -5,14 +5,16 @@ import com.example.login.api.dto.LoginResponse;
 import com.example.login.api.dto.RefreshRequest;
 import com.example.login.api.dto.RefreshResponse;
 import com.example.login.api.dto.RegisterRequest;
+import com.example.login.application.AuditService;
 import com.example.login.application.AuthResult;
 import com.example.login.application.AuthService;
-import com.example.login.application.AuditService;
 import com.example.login.application.SessionService;
 import com.example.login.domain.SessionToken;
 import com.example.login.domain.User;
-import com.example.login.infrastructure.repository.UserRepository;
+import com.example.login.infrastructure.exception.ApiError;
 import com.example.login.infrastructure.repository.RoleRepository;
+import com.example.login.infrastructure.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -28,13 +30,11 @@ import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -52,31 +52,31 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Validated RegisterRequest request, HttpServletRequest servletRequest) {
-        // 檢查用戶名是否已存在
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            Map<String, Object> body = new HashMap<>();
-            body.put("code", "USERNAME_EXISTS");
-            body.put("message", "帳號已存在");
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(ApiError.of("USERNAME_EXISTS", "帳號已存在"));
         }
 
-        // 創建新用戶
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
         user.setStatus("active");
         user.setFailedAttempts(0);
-        
-        // 分配 USER 角色
-        var userRole = roleRepository.findByCode("USER");
-        if (userRole.isPresent()) {
-            user.getRoles().add(userRole.get());
+
+        var roleCodes = request.getRoleCodes();
+        if (roleCodes == null || roleCodes.isEmpty()) {
+            roleRepository.findByCode("USER").ifPresent(user.getRoles()::add);
+        } else {
+            roleCodes.stream()
+                    .map(roleRepository::findByCode)
+                    .filter(java.util.Optional::isPresent)
+                    .map(java.util.Optional::get)
+                    .forEach(user.getRoles()::add);
         }
-        
+
         user = userRepository.save(user);
 
-        // 註冊成功後自動登入，創建 session 並返回 token
         String ip = servletRequest.getRemoteAddr();
         String userAgent = servletRequest.getHeader("User-Agent");
         String deviceInfo = userAgent != null ? userAgent : "unknown";
@@ -85,7 +85,6 @@ public class AuthController {
         String accessToken = encodeAccessToken(user);
 
         auditService.record(user, session, "auth", "register", "allow", null, ip, userAgent);
-        
         return ResponseEntity.status(HttpStatus.CREATED).body(new LoginResponse(accessToken, refreshToken));
     }
 
@@ -93,17 +92,14 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody @Validated LoginRequest request, HttpServletRequest servletRequest) {
         AuthResult result = authService.authenticate(request.getUsername(), request.getPassword());
         if (result.getStatus() == AuthResult.Status.LOCKED) {
-            Map<String, Object> body = new HashMap<>();
-            body.put("code", "LOCKED");
-            body.put("message", "帳號已鎖定");
-            body.put("lockedUntil", result.getLockedUntil());
-            return ResponseEntity.status(HttpStatus.LOCKED).body(body);
+            Map<String, Object> data = new HashMap<>();
+            data.put("lockedUntil", result.getLockedUntil());
+            return ResponseEntity.status(HttpStatus.LOCKED)
+                    .body(ApiError.of("LOCKED", "帳號已鎖定", data));
         }
         if (result.getStatus() == AuthResult.Status.FAILED) {
-            Map<String, Object> body = new HashMap<>();
-            body.put("code", "INVALID_CREDENTIALS");
-            body.put("message", "帳號或密碼錯誤");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiError.of("INVALID_CREDENTIALS", "帳號或密碼錯誤"));
         }
 
         User user = result.getUser();
@@ -127,10 +123,8 @@ public class AuthController {
 
         var sessionOpt = sessionService.findValidSessionByRefreshToken(refreshToken);
         if (sessionOpt.isEmpty()) {
-            Map<String, Object> body = new HashMap<>();
-            body.put("code", "REFRESH_INVALID");
-            body.put("message", "refresh token 無效或已過期/撤銷");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiError.of("REFRESH_INVALID", "refresh token 無效或已過期/撤銷"));
         }
 
         var session = sessionOpt.get();
@@ -146,44 +140,29 @@ public class AuthController {
         String ip = servletRequest.getRemoteAddr();
         String userAgent = servletRequest.getHeader("User-Agent");
         auditService.record(null, null, "auth", "logout", "allow", revoked ? "revoked" : "no-token", ip, userAgent);
-        Map<String, Object> body = new HashMap<>();
-        body.put("success", true);
-        body.put("revoked", revoked);
-        return ResponseEntity.ok(body);
+        Map<String, Object> data = new HashMap<>();
+        data.put("revoked", revoked);
+        return ResponseEntity.ok(ApiError.of("LOGOUT_OK", "登出完成", data));
     }
 
     private String encodeAccessToken(User user) {
-        try {
-            Instant now = Instant.now();
-            Set<String> roles = user.getRoles().stream().map(r -> r.getCode()).collect(Collectors.toSet());
-            Set<String> perms = user.getRoles().stream()
-                    .flatMap(r -> r.getPermissions().stream())
-                    .map(p -> p.getCode())
-                    .collect(Collectors.toSet());
+        Instant now = Instant.now();
+        Set<String> roles = user.getRoles().stream().map(r -> r.getCode()).collect(Collectors.toSet());
+        Set<String> perms = user.getRoles().stream()
+                .flatMap(r -> r.getPermissions().stream())
+                .map(p -> p.getCode())
+                .collect(Collectors.toSet());
 
-            System.out.println("=== Creating JWT Claims ===");
-            System.out.println("Username: " + user.getUsername());
-            System.out.println("Roles: " + roles);
-            System.out.println("Permissions: " + perms);
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("login-system")
+                .issuedAt(now)
+                .expiresAt(now.plus(15, ChronoUnit.MINUTES))
+                .subject(user.getUsername())
+                .claim("roles", new java.util.ArrayList<>(roles))
+                .claim("perms", new java.util.ArrayList<>(perms))
+                .build();
 
-            JwtClaimsSet claims = JwtClaimsSet.builder()
-                    .issuer("login-system")
-                    .issuedAt(now)
-                    .expiresAt(now.plus(15, ChronoUnit.MINUTES))
-                    .subject(user.getUsername())
-                    .claim("roles", new java.util.ArrayList<>(roles))
-                    .claim("perms", new java.util.ArrayList<>(perms))
-                    .build();
-            
-            System.out.println("Claims created, encoding...");
-            var header = org.springframework.security.oauth2.jwt.JwsHeader.with(MacAlgorithm.HS256).build();
-            String token = jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
-            System.out.println("Token encoded successfully, length: " + token.length());
-            return token;
-        } catch (Exception e) {
-            System.err.println("Error encoding JWT: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
+        JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
+        return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 }

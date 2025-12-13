@@ -3,6 +3,7 @@ package com.example.login.api.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.Set;
 import lombok.Data;
 
 @Data
@@ -17,4 +18,7 @@ public class RegisterRequest {
 
     @Email(message = "Email 格式不正確")
     private String email;
+
+    // 可選：指定角色代碼（如 USER/ADMIN/AUDITOR），未提供則預設 USER
+    private Set<String> roleCodes;
 }

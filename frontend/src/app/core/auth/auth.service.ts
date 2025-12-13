@@ -1,10 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, switchMap, mapTo } from 'rxjs';
+import { Observable, tap, switchMap, mapTo, finalize } from 'rxjs';
 
 export interface LoginPayload {
   username: string;
   password: string;
+}
+
+export interface RegisterPayload {
+  username: string;
+  password: string;
+  email?: string;
+  roleCodes?: string[];
 }
 
 export interface LoginResult {
@@ -74,11 +81,25 @@ export class AuthService {
     );
   }
 
+  register(payload: RegisterPayload): Observable<void> {
+    return this.http.post<LoginResult>('/api/auth/register', payload).pipe(
+      tap((res) => {
+        localStorage.setItem(this.accessTokenKey, res.accessToken);
+        localStorage.setItem(this.refreshTokenKey, res.refreshToken ?? '');
+      }),
+      switchMap(() => this.fetchCurrentUser()),
+      tap((user) => this.storeUser(user)),
+      mapTo(void 0)
+    );
+  }
+
   logout(): Observable<{ success: boolean; revoked: boolean }> {
     const refreshToken = this.getRefreshToken();
-    return this.http.post<{ success: boolean; revoked: boolean }>('/api/auth/logout', {
-      refreshToken,
-    });
+    return this.http
+      .post<{ success: boolean; revoked: boolean }>('/api/auth/logout', {
+        refreshToken,
+      })
+      .pipe(finalize(() => this.clear()));
   }
 
   fetchCurrentUser(): Observable<CurrentUser> {

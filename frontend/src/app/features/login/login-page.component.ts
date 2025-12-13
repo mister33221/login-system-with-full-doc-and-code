@@ -57,12 +57,18 @@ export class LoginPageComponent {
         this.router.navigate(['/']);
       },
       error: (err) => {
+        const backendMsg: string | undefined = err?.error?.message;
+        const fieldErrors = err?.error?.data as Record<string, string> | undefined;
         if (err.status === 401) {
-          this.error = '帳號或密碼錯誤';
+          this.error = fieldErrors?.['password'] || backendMsg || '帳號或密碼錯誤';
         } else if (err.status === 423) {
-          this.error = '帳號已鎖定';
+          this.error = backendMsg ?? '帳號已鎖定';
         } else {
-          this.error = '系統發生錯誤，請稍後再試';
+          this.error =
+            fieldErrors?.['password'] ||
+            fieldErrors?.['username'] ||
+            backendMsg ||
+            '系統發生錯誤，請稍後再試';
         }
       },
     });

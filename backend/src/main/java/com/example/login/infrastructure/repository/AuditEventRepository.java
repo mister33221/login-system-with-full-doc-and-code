@@ -11,12 +11,13 @@ import org.springframework.data.repository.query.Param;
 public interface AuditEventRepository extends JpaRepository<AuditEvent, UUID> {
     @Query("""
             select e from AuditEvent e
+            left join fetch e.user u
             where (:username is null or e.user.username = :username)
               and (:resource is null or e.resource = :resource)
               and (:action is null or e.action = :action)
               and (:decision is null or e.decision = :decision)
-              and (:fromTime is null or e.createdAt >= :fromTime)
-              and (:toTime is null or e.createdAt <= :toTime)
+              and (e.createdAt >= coalesce(:fromTime, e.createdAt))
+              and (e.createdAt <= coalesce(:toTime, e.createdAt))
             order by e.createdAt desc
             """)
     List<AuditEvent> search(
