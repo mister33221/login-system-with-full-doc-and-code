@@ -57,48 +57,48 @@ description: "Task list for login & RBAC system"
 ## Phase 3: User Story 1 - 安全登入與登出體驗（P1） ✅ MVP
 
 ### Tests for User Story 1
-- [ ] T016 [P] 後端單元測試：登入服務（成功/失敗/鎖定）：`backend/src/test/java/.../application`
-- [ ] T017 [P] 後端整合測試：登入/登出/逾時/撤銷 Token：`backend/src/test/java/.../api`
-- [ ] T018 前端 E2E/整合（可選）：登入成功/失敗流程：`frontend/`（若時程允許）
+- [X] T016 [P] 後端單元測試：登入服務（成功/失敗/鎖定）：`backend/src/test/java/.../application`
+- [X] T017 [P] 後端整合測試：登入/登出/逾時/撤銷 Token：`backend/src/test/java/.../api`
+- [X] T018 前端 E2E/整合（可選）：登入成功/失敗流程：`frontend/`（若時程允許）
 
 ### Implementation for User Story 1
-- [ ] T019 登入 API（發行 access/refresh，寫入 Session/Audit）：`backend/src/main/java/.../api/AuthController`
-- [ ] T020 登出/撤銷 API（失效 access+refresh，跨裝置阻擋）：`backend/src/main/java/.../api/AuthController`
-- [ ] T021 閒置逾時與 token 過期處理（後端/前端互動）：`backend/...`, `frontend/.../core/auth`
-- [ ] T022 鎖定策略（5 次失敗鎖 15m）與提示：`backend/src/main/java/.../application/AuthService`
-- [ ] T023 記錄登入/登出/拒絕事件至 Audit：`backend/.../application` & `.../infrastructure`
-- [ ] T024 前端登入頁與狀態呈現：`frontend/src/app/features/login`
-- [ ] T025 前端錯誤頁（403/404）與未授權導引：`frontend/src/app/pages/error`
+- [X] T019 登入 API（發行 access/refresh，寫入 Session/Audit）：`backend/src/main/java/.../api/AuthController`
+- [X] T020 登出/撤銷 API（失效 access+refresh，跨裝置阻擋）：`backend/src/main/java/.../api/AuthController`
+- [X] T021 閒置逾時與 token 過期處理（後端/前端互動）：`backend/...`, `frontend/.../core/auth`
+- [X] T022 鎖定策略（5 次失敗鎖 15m）與提示：`backend/src/main/java/.../application/AuthService`
+- [X] T023 記錄登入/登出/拒絕事件至 Audit：`backend/.../application` & `.../infrastructure`
+- [X] T024 前端登入頁與狀態呈現：`frontend/src/app/features/login`
+- [X] T025 前端錯誤頁（403/404）與未授權導引：`frontend/src/app/pages/error`
 
 ## Phase 4: User Story 2 - 角色與權限配置（P1）
 
 ### Tests for User Story 2
-- [ ] T026 後端單元測試：角色/權限服務：`backend/src/test/java/.../application`
-- [ ] T027 後端整合測試：角色/權限 CRUD 與授權檢查：`backend/src/test/java/.../api`
-- [ ] T028 前端測試（可選）：角色/權限 UI 驗證：`frontend/`
+- [X] T026 後端單元測試：角色/權限服務：`backend/src/test/java/.../application`
+- [X] T027 後端整合測試：角色/權限 CRUD 與授權檢查：`backend/src/test/java/.../api`
+- [X] T028 前端測試（可選）：角色/權限 UI 驗證：`frontend/`
 
 ### Implementation for User Story 2
-- [ ] T029 角色/權限 CRUD API：`backend/src/main/java/.../api/RoleController`
-- [ ] T030 角色與使用者關聯操作（多角色）：`backend/src/main/java/.../application/RoleService`
-- [ ] T031 受保護資源授權檢查（基於 RBAC）：`backend/src/main/java/.../infrastructure/security`
-- [ ] T032 前端角色/權限管理介面（最小可用）：`frontend/src/app/features/admin/roles`
-- [ ] T033 目前使用者資訊 API 及前端顯示：`backend/src/main/java/.../api/UserController`, `frontend/src/app/core/auth`
+- [X] T029 角色/權限 CRUD API：`backend/src/main/java/.../api/RoleController`
+- [X] T030 角色與使用者關聯操作（多角色）：`backend/src/main/java/.../application/RoleService`
+- [X] T031 受保護資源授權檢查（基於 RBAC）：`backend/src/main/java/.../infrastructure/security`
+- [X] T032 前端角色/權限管理介面（最小可用）：`frontend/src/app/features/admin/roles`
+- [X] T033 目前使用者資訊 API 及前端顯示：`backend/src/main/java/.../api/UserController`, `frontend/src/app/core/auth`
 
 ## Phase 5: User Story 3 - 存取管控與稽核可追溯性（P2）
 
 ### Tests for User Story 3
-- [ ] T034 後端整合測試：稽核查詢/過濾：`backend/src/test/java/.../api`
-- [ ] T035 前端測試（可選）：稽核列表/篩選：`frontend/`
+- [X] T034 後端整合測試：稽核查詢/過濾：`backend/src/test/java/.../api`
+- [X] T035 前端測試（可選）：稽核列表/篩選：`frontend/`
 
 ### Implementation for User Story 3
-- [ ] T036 稽核查詢 API（登入/登出/拒絕/角色變更）：`backend/src/main/java/.../api/AuditController`
-- [ ] T037 稽核儲存策略與查詢索引：`backend/src/main/java/.../infrastructure/repository`
-- [ ] T038 前端稽核檢視（管理員可查詢篩選）：`frontend/src/app/features/admin/audit`
+- [X] T036 稽核查詢 API（登入/登出/拒絕/角色變更）：`backend/src/main/java/.../api/AuditController`
+- [X] T037 稽核儲存策略與查詢索引：`backend/src/main/java/.../infrastructure/repository`
+- [X] T038 前端稽核檢視（管理員可查詢篩選）：`frontend/src/app/features/admin/audit`
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T039 前端/後端日誌/指標/告警最小化設定（登入/授權/錯誤事件）：`backend/.../infrastructure`, `frontend/...`
-- [ ] T040 效能檢查：API p95 < 300ms、首屏互動 < 2.5s（如需可測腳本/指標）  
-- [ ] T041 文件收斂（更新 SA/SD/操作手冊、README/quickstart）：`/`
-- [ ] T042 稽核/安全回歸：確認 token 時效、鎖定策略、多裝置撤銷行為
-- [ ] T043 清理 TODO、最終回歸測試與驗收
+- [X] T039 前端/後端日誌/指標/告警最小化設定（登入/授權/錯誤事件）：`backend/.../infrastructure`, `frontend/...`
+- [X] T040 效能檢查：API p95 < 300ms、首屏互動 < 2.5s（如需可測腳本/指標）  
+- [X] T041 文件收斂（更新 SA/SD/操作手冊、README/quickstart）：`/`
+- [X] T042 稽核/安全回歸：確認 token 時效、鎖定策略、多裝置撤銷行為
+- [X] T043 清理 TODO、最終回歸測試與驗收

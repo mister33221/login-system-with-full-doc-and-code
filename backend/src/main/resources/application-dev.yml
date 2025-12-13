@@ -23,5 +23,5 @@ logging:
     org.hibernate.SQL: INFO
 security:
   jwt:
-    # Base64 or raw secret; replace with secure value before production
-    secret: "dev-secret-key-please-change-1234567890"
+    # 256-bit secret (Base64 encoded)
+    secret: "V40aF0Fe/JkTyLVrO79ASTYtvYIhe8fhsXFVkZr9fWs="

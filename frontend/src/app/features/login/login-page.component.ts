@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-login-page',
@@ -43,17 +44,27 @@ export class LoginPageComponent {
   password = '';
   error = '';
 
-  constructor(private readonly router: Router) {}
+  constructor(private readonly router: Router, private readonly auth: AuthService) {}
 
   login() {
-    // TODO: call backend; for now, mock success and store dummy token/role
     if (!this.username || !this.password) {
       this.error = '請輸入帳號與密碼';
       return;
     }
-    localStorage.setItem('access_token', 'demo-token');
-    localStorage.setItem('roles', JSON.stringify(['ADMIN']));
-    this.error = '';
-    this.router.navigate(['/']);
+    this.auth.login({ username: this.username, password: this.password }).subscribe({
+      next: () => {
+        this.error = '';
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        if (err.status === 401) {
+          this.error = '帳號或密碼錯誤';
+        } else if (err.status === 423) {
+          this.error = '帳號已鎖定';
+        } else {
+          this.error = '系統發生錯誤，請稍後再試';
+        }
+      },
+    });
   }
 }

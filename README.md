@@ -1,71 +1,80 @@
 # Login & RBAC System (Practice)
 
-一個練習用的前後端登入與 RBAC 系統，包含 Angular 前端、Spring Boot/Security 後端、PostgreSQL、Nginx 反向代理。功能涵蓋登入/登出、角色與權限、會話管理、Token 撤銷與稽核記錄。文件整理在 `docs/sa`（需求/分析）與 `docs/sd`（設計/架構），API 文件透過 Swagger UI 提供。
+一個練習用的前後端登入 + RBAC 系統，包含 Angular 前端、Spring Boot/Security 後端、PostgreSQL、Nginx（開發階段反向代理），並附完整 SA/SD 文件。
 
-## 目的與功能
-- 使用帳號密碼登入/登出，支援閒置逾時與 Token 撤銷（跨裝置）。
-- 基於角色/權限的存取控制（RBAC），支援角色與權限的配置與查詢。
-- 會話管理：列出/撤銷特定會話。
-- 稽核記錄：登入、拒絕、角色/權限變更等事件。
-- API 文件：Springdoc OpenAPI `/swagger-ui.html`。
+## 功能概述
+- 登入/登出、Access/Refresh Token、鎖定策略（5 次錯誤鎖 15 分鐘）。
+- RBAC：角色/權限 CRUD、使用者角色指派、權限檢查。
+- 稽核：登入/登出/拒絕/角色變更記錄與查詢。
+- API 文件：Swagger UI `/swagger-ui.html`。
 
-## 主要技術
-- 前端：Angular 17 + Tailwind、Router Guard、HTTP Interceptor。
-- 後端：Spring Boot 3.x、Spring Security（JWT Resource Server）、Spring Data JPA、Flyway。
-- DB：PostgreSQL。
-- Proxy：Nginx（開發代理前端/後端）。
-- API 文件：Springdoc OpenAPI + Swagger UI。
+## 目錄重點
+- `backend/`：Spring Boot 3 + Spring Security (JWT Resource Server) + JPA + Flyway。
+- `frontend/`：Angular 17 + Tailwind + Router Guard + HTTP Interceptor。
+- `nginx/`、`docker-compose.yml`：開發用 Nginx 反向代理與 PostgreSQL。
+- `docs/sa`：SA（Use Case、RBAC 模型、流程、API 規格、資料模型、安全政策、驗收案例）。
+- `docs/sd`：SD（架構圖、部署流程、效能/安全回歸指引、日誌/監控）。
 
-## 環境需求
-- Node.js (npm)
+## 先決條件
 - Java 17、Maven
-- Docker（如需啟動 Postgres/Nginx via compose）
+- Node.js (npm)
+- Docker（啟動 Postgres / Nginx）
 
-## 如何啟動
-### 1) 啟動資料庫（PostgreSQL）
-- 使用 docker-compose 只啟動 db 服務：
-  ```bash
-  docker compose up -d db
-  ```
-  資料庫預設：`jdbc:postgresql://localhost:5432/loginapp`，帳密 `appuser` / `apppass`。
+## 快速啟動
+1) 啟動 PostgreSQL（docker-compose，僅 DB）
+```bash
+docker compose up -d db
+# DB: jdbc:postgresql://localhost:5432/loginapp, user/pass: appuser/apppass
+```
 
-### 2) 啟動後端（Spring Boot, dev profile）
+2) 啟動後端（dev profile）
 ```bash
 cd backend
 mvn spring-boot:run -Pdev
-# 或
-# mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# 健康檢查: http://localhost:8080/api/health
+# Swagger UI : http://localhost:8080/swagger-ui.html
 ```
-啟動後：
-- 健康檢查：`http://localhost:8080/api/health`
-- Swagger UI：`http://localhost:8080/swagger-ui.html`
 
-### 3) 啟動前端（Angular dev server）
+3) 啟動前端（Angular dev server）
 ```bash
 cd frontend
 npm install
 npm run start
+# 前端預設 http://localhost:4200/login
 ```
-- 前端 dev server 預設 `http://localhost:4200/login`
-- 若有 Nginx 代理（docker-compose），可由 `http://localhost` 透過 Nginx 轉發。
 
-> 註：目前後端功能尚未完成（登入/刷新/登出/角色/會話 API 未實作，前端仍為樣板存假 token）。需完成 API 並串接後再進行實測。
+4) （可選）啟動 Nginx 作為開發反向代理
+```bash
+docker compose up -d nginx
+# 反向代理 http://localhost → 前端/後端
+```
 
-## 測試
-- 後端：計畫使用 JUnit/AssertJ 寫單元/整合測試（尚未實作）。啟動 DB 後可執行：
-  ```bash
-  cd backend
-  mvn test -Pdev
-  ```
-- 前端：可使用 Angular 測試工具（尚未撰寫）。預計在實作完成後加入單元/端對端測試。
+## 測試與覆蓋率
+- 後端單元/整合測試：
+```bash
+cd backend
+mvn test
+# JaCoCo 報告：backend/target/site/jacoco/index.html
+```
+- 前端測試：
+```bash
+cd frontend
+npm test
+```
 
-## 文件
-- 需求/分析（SA）：`docs/sa/`（Use Case、RBAC 模型、流程、API 草案、資料模型、安全政策、線框、測試案例等）。
-- 設計/架構（SD）：`docs/sd/`（架構圖、部署/流程圖、API 文件說明）。
-- API 文件：啟動後端後至 `/swagger-ui.html`。
+## 開發注意事項
+- DB 使用 PostgreSQL（Flyway 使用 uuid/inet 型別）；需先啟動 DB。
+- JWT secret 請於 `application-dev.yml` / `application-prod.yml` 設定。
+- `docs/sd/security-regression.md`：安全/稽核回歸清單；`docs/sd/perf-check.md`：效能檢查指引。
+- 程式與文件須符合 `docs/sa` / `docs/sd` 原則；完成任務記得更新 `specs/001-login-system/tasks.md`。
 
-## 注意事項
-- 後端 dev profile 預設使用 PostgreSQL，啟動前請先啟動 DB。
-- Flyway migrations 使用 PostgreSQL 專用型別/擴展（uuid/inet），確保 DB 為 Postgres。
-- JWT secret 請在 `application-dev.yml` / `application-prod.yml` 設定安全值。
-- 目前 admin 密碼種子為佔位 hash，實務需更新為真實 bcrypt。
+## 主要 API（摘要）
+- 認證：`POST /api/auth/login`、`POST /api/auth/refresh`、`POST /api/auth/logout`
+- 使用者資訊：`GET /api/me`
+- 角色/權限：`GET/POST/PUT/DELETE /api/roles`、`GET /api/permissions`、`PUT /api/users/{username}/roles`
+- 稽核：`GET /api/audit`（可依 user/resource/action/decision/from/to 篩選）
+
+## 其他
+- 反向代理設定：`nginx/nginx.conf`（預留 TLS）。
+- 日誌/監控：`docs/sd/logging-monitoring.md`。
+- 效能與安全回歸：`docs/sd/perf-check.md`、`docs/sd/security-regression.md`。

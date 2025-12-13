@@ -32,7 +32,7 @@ public class SessionToken {
     private String deviceInfo;
 
     // 來源 IP
-    @Column(columnDefinition = "inet")
+    @Column(length = 45)
     private String ip;
 
     @Column(length = 255)
